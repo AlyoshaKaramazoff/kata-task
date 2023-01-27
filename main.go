@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Contains функция возвращет true, если элемент содержится в массиве
 func Contains(a []string, x string) bool {
 	for _, n := range a {
 		if x == n {
@@ -17,6 +18,7 @@ func Contains(a []string, x string) bool {
 	return false
 }
 
+// Find функция возвращает индекс элемента в массиве
 func Find(a []string, x string) int {
 	for i, n := range a {
 		if x == n {
@@ -26,7 +28,8 @@ func Find(a []string, x string) int {
 	return len(a)
 }
 
-func romanToArabic(x string) (int, bool) {
+// RomanToArabic перевод римских чисел (от 1(I) до 10(X)) в арабские
+func RomanToArabic(x string) (int, bool) {
 	romanNums := []string{"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
 	if Contains(romanNums, x) {
 		return Find(romanNums, x) + 1, true
@@ -35,16 +38,21 @@ func romanToArabic(x string) (int, bool) {
 	}
 }
 
+// getNumber возращает число и статус преобразования из строки
+// если строка содержала арабское число, то функция возвращет это самое число и статус false (т.е. не было преобразования)
+// если строка содержала римское число, то - конвертированное римское в арабское число и статус true
+// если функция не смогла провести никакое преобраование, то возвращает -1 и статус false
 func getNumber(x string) (int, bool) {
 	num, err := strconv.Atoi(x)
 	if err == nil {
 		return num, false
 	} else {
-		return romanToArabic(x)
+		return RomanToArabic(x)
 	}
 }
 
-func arabicToRoman(x int) string {
+// ArabicToRoman преобразование арабского числа в римское (от 1(I) до 100(С))
+func ArabicToRoman(x int) string {
 	romanNums := []string{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
 	hundreds := 0
 	tens := 0
@@ -85,6 +93,7 @@ func main() {
 
 	var mathRes int
 
+	// Консольный ввод
 	in := bufio.NewScanner(os.Stdin)
 	fmt.Print("INPUT: ")
 	in.Scan()
@@ -93,6 +102,7 @@ func main() {
 	x := make([]string, 3)
 	symbols := strings.Split(line, " ")
 
+	// Проверка корректности ввода по длине полученного массива
 	if len(symbols) != 3 {
 		fmt.Println("Incorrect input")
 		return
@@ -110,6 +120,7 @@ func main() {
 		operand2 := x[2]
 		operation := x[1]
 
+		// Проверка корректности ввода математическго оператора
 		mathOperations := []string{"+", "-", "*", "/"}
 		if Contains(mathOperations, operation) == false {
 			fmt.Println("Indefinite math operation")
@@ -117,9 +128,13 @@ func main() {
 
 		} else {
 
+			// преобразование введённых чисел string -> int
+			// и получение статуса преобразования
 			int1, status1 := getNumber(operand1)
 			int2, status2 := getNumber(operand2)
 
+			// если оба числа одного представления и если числа корректны,
+			// то выполняем математичсекие вычисления
 			if status1 == status2 && (int1 > -1 && int2 > -1) {
 				switch operation {
 				case "+":
@@ -133,25 +148,31 @@ func main() {
 				}
 			}
 
+			// ошибка преобразования строки в число
 			if int1 == -1 || int2 == -1 {
 				fmt.Println("Indefinite operand")
 				return
 			}
+
+			// числа различного представления (арабское и римское)
 			if status1 != status2 {
 				fmt.Println("Please use only arabic or only roman numbers")
 				return
 			}
 
+			// успешно (арабские числа)
 			if status1 == false && status2 == false {
 				fmt.Printf("OUTPUT: %d", mathRes)
 				return
 			}
 
+			// успешно (римские числа)
 			if (status1 == true && status2 == true) && mathRes > 0 {
-				fmt.Printf("OUTPUT: %s", arabicToRoman(mathRes))
+				fmt.Printf("OUTPUT: %s", ArabicToRoman(mathRes))
 				return
 			}
 
+			// ошибка: при введёных римских числах получили неположительный результат вычисления
 			if (status1 == true && status2 == true) && mathRes <= 0 {
 				fmt.Println("Non-positive calculation result not available for Roman numerals")
 				return
